@@ -8,13 +8,18 @@
 
 import React, {Component} from 'react';
 import {StyleSheet, View, Text, StatusBar} from 'react-native';
-
+import {connect} from 'react-redux';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import LocalNotification from './src/utils/LocalNotification';
-
+import {
+  storeNotificationsLocally,
+  fetchNotifications,
+} from './src/config/store/actions';
 class App extends Component {
-  componentDidMount() {
-    LocalNotification.register();
+  async componentDidMount() {
+    await this.props.storeNotificationsLocally();
+    await this.props.fetchNotifications();
+    LocalNotification.register(this.props.notifications);
   }
 
   componentWillUnmount() {
@@ -59,4 +64,16 @@ const styles = StyleSheet.create({
   },
 });
 
-export default App;
+const mapStateToProps = state => {
+  return {
+    notifications: state.notifications.notifications,
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  {
+    storeNotificationsLocally,
+    fetchNotifications,
+  },
+)(App);
