@@ -4,7 +4,6 @@ import messages from '../assets/Salawat';
 import moment from 'moment';
 
 const _handleAppStateChange = nextAppState => {
-  console.log('nextAppState', nextAppState);
   if (nextAppState === 'active') {
     _registerLocalNotification();
   }
@@ -30,155 +29,94 @@ const _registerLocalNotification = () => {
   const fajerTime = new Date(Date.now());
   fajerTime.setHours(todaySalawat.fajer.split(':')[0]);
   fajerTime.setMinutes(todaySalawat.fajer.split(':')[1]);
+  const fajerMsg = 'Fajer Salat Notify';
 
   const sunriseTime = new Date(Date.now());
   sunriseTime.setHours(todaySalawat.sunrise.split(':')[0]);
   sunriseTime.setMinutes(todaySalawat.sunrise.split(':')[1]);
+  const sunriseMsg = 'Sunrise Salat Notify';
 
   const dhuhurTime = new Date(Date.now());
   dhuhurTime.setHours(todaySalawat.dhuhur.split(':')[0]);
   dhuhurTime.setMinutes(todaySalawat.dhuhur.split(':')[1]);
+  const dhuhurMsg = 'dhuhur Salat Notify';
 
   const asrTime = new Date(Date.now());
   asrTime.setHours(todaySalawat.asr.split(':')[0]);
   asrTime.setMinutes(todaySalawat.asr.split(':')[1]);
+  const asrMsg = 'asr Salat Notify';
 
   const maghrebTime = new Date(Date.now());
   maghrebTime.setHours(todaySalawat.maghreb.split(':')[0]);
   maghrebTime.setMinutes(todaySalawat.maghreb.split(':')[1]);
+  const maghrebMsg = 'maghreb Salat Notify';
 
   const IshaaTime = new Date(Date.now());
   IshaaTime.setHours(todaySalawat.Ishaa.split(':')[0]);
   IshaaTime.setMinutes(todaySalawat.Ishaa.split(':')[1]);
+  const IshaaMsg = 'Ishaa Salat Notify';
 
-  new Date(Date.now()).getTime() <= fajerTime.getTime() &&
-    PushNotification.localNotificationSchedule({
-      vibrate: true,
-      vibration: 300,
-      priority: 'hight',
-      visibility: 'public',
-      importance: 'hight',
-      foreground: true,
-
-      message: 'حان الان موعد صلاة الفجر', // (required)
-      playSound: true,
-      soundName: 'default',
-      autoCancel: true,
-      ticker: 'My Notification Ticker',
-      number: 1,
-      actions: '["OK"]',
-      repeatType: 'day',
+  const data = [
+    {
       date: fajerTime,
-    });
-  if (new Date(Date.now()).getTime() <= sunriseTime.getTime()) {
-    PushNotification.localNotificationSchedule({
-      vibrate: true,
-      vibration: 300,
-      priority: 'hight',
-      visibility: 'public',
-      importance: 'hight',
-      foreground: true,
-
-      message: 'حان الان موعد صلاة الشروق', // (required)
-      playSound: true,
-      soundName: 'default',
-      autoCancel: true,
-      ticker: 'My Notification Ticker',
-      number: 1,
-      actions: '["OK"]',
-      repeatType: 'day',
+      msg: fajerMsg,
+    },
+    {
       date: sunriseTime,
-    });
-    console.log('sunriseTime pushhed');
-  }
-  new Date(Date.now()).getTime() <= dhuhurTime.getTime() &&
-    PushNotification.localNotificationSchedule({
-      vibrate: true,
-      vibration: 300,
-      priority: 'hight',
-      visibility: 'public',
-      importance: 'hight',
-      foreground: true,
-
-      message: 'حان الان موعد صلاة الظهر', // (required)
-      playSound: true,
-      soundName: 'default',
-      autoCancel: true,
-      ticker: 'My Notification Ticker',
-      number: 1,
-      actions: '["OK"]',
-      repeatType: 'day',
+      msg: sunriseMsg,
+    },
+    {
       date: dhuhurTime,
-    });
-
-  new Date(Date.now()).getTime() <= asrTime.getTime() &&
-    PushNotification.localNotificationSchedule({
+      msg: dhuhurMsg,
+    },
+    {
+      date: asrTime,
+      msg: asrMsg,
+    },
+    {
+      date: maghrebTime,
+      msg: maghrebMsg,
+    },
+    {
+      date: IshaaTime,
+      msg: IshaaMsg,
+    },
+  ];
+  const addNotification = ({date, message}) => {
+    const notification = {
       vibrate: true,
       vibration: 300,
       priority: 'hight',
       visibility: 'public',
       importance: 'hight',
       foreground: true,
-
-      message: 'حان الان موعد صلاة العصر', // (required)
+      message, // (required)
       playSound: true,
       soundName: 'default',
       autoCancel: true,
       ticker: 'My Notification Ticker',
       number: 1,
-      actions: '["OK"]',
+      actions: '["VIEW"]',
       repeatType: 'day',
-      date: asrTime,
-    });
-  new Date(Date.now()).getTime() <= maghrebTime.getTime() &&
-    PushNotification.localNotificationSchedule({
-      vibrate: true,
-      vibration: 300,
-      priority: 'hight',
-      visibility: 'public',
-      importance: 'hight',
-      foreground: true,
+      date,
+    };
+    if (date.getTime() > new Date(Date.now())) {
+      PushNotification.localNotificationSchedule(notification);
+    }
+  };
 
-      message: 'حان الان موعد صلاة المغرب', // (required)
-      playSound: true,
-      soundName: 'default',
-      autoCancel: true,
-      number: 1,
-      actions: '["OK"]',
-      ticker: 'push notify',
-      repeatType: 'day',
-      date: maghrebTime,
+  data.forEach(({date, msg}) => {
+    addNotification({
+      date,
+      message: msg,
     });
-  new Date(Date.now()).getTime() <= IshaaTime.getTime() &&
-    PushNotification.localNotificationSchedule({
-      vibrate: true,
-      vibration: 300,
-      priority: 'hight',
-      visibility: 'public',
-      importance: 'hight',
-      foreground: true,
-
-      message: 'حان الان موعد صلاة العشاء', // (required)
-      playSound: true,
-      soundName: 'default',
-      autoCancel: true,
-      number: 1,
-      actions: '["OK"]',
-      ticker: 'push notify',
-      repeatType: 'day',
-      date: IshaaTime,
-    });
+  });
 };
 
 export default {
   register: async () => {
     PushNotification.configure({
       onNotification: function(notification) {
-        console.log('notification', notification);
-        console.log(
-          'PushNotificationIOS.FetchResult.NoData',
-          PushNotificationIOS.FetchResult.NoData,
-        );
         notification.finish(PushNotificationIOS.FetchResult.NoData);
       },
       popInitialNotification: true,
