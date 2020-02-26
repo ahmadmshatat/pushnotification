@@ -4,12 +4,16 @@ import {
 } from './types';
 import {AsyncStorage} from 'react-native';
 import SalawatData from '../../data/Salawat.json';
+import moment from 'moment';
+import constant from '../constants/constants';
 
-const handleNotify = (notify, name, message) => {
+const handleNotify = (notify, name, message, timeType = 'AM') => {
   const month = notify.month;
   const day = notify.day;
-  const hours = notify[name].split(':')[0];
-  const minutes = notify[name].split(':')[1];
+  const time = `${notify[name]} ${timeType}`;
+  var dt = moment(time, ['h:mm A']).format('HH:mm');
+  const hours = dt.split(':')[0];
+  const minutes = dt.split(':')[1];
   const date = new Date(Date.now());
   date.setHours(hours);
   date.setMinutes(minutes);
@@ -25,20 +29,22 @@ export const fetchNotifications = () => async dispatch => {
   const notifications = await AsyncStorage.getItem('salatReminder');
   const parsedNotifications = JSON.parse(notifications);
   const processedNotifications = parsedNotifications.map(notify => {
-    const fajer = handleNotify(notify, 'fajer', 'حان الان موعد صلاة الفجر');
-    const sunrise = handleNotify(
-      notify,
-      'sunrise',
-      'حان الان موعد صلاة الشروق',
-    );
-    const dhuhur = handleNotify(notify, 'dhuhur', 'حان الان موعد صلاة الظهر');
-    const asr = handleNotify(notify, 'asr', 'حان الان موعد صلاة العصر');
-    const maghreb = handleNotify(
-      notify,
-      'maghreb',
-      'حان الان موعد صلاة المغرب',
-    );
-    const Ishaa = handleNotify(notify, 'Ishaa', 'حان الان موعد صلاة العشاء');
+    const fajer = handleNotify(notify, 'fajer', constant.fajerMsg, 'AM');
+    const sunrise = handleNotify(notify, 'sunrise', constant.sunriseMsg, 'AM');
+    const dhuhur = handleNotify(notify, 'dhuhur', constant.dhuhurMsg, 'PM');
+    const asr = handleNotify(notify, 'asr', constant.asrMsg, 'PM');
+    const maghreb = handleNotify(notify, 'maghreb', constant.maghrebMsg, 'PM');
+    const Ishaa = handleNotify(notify, 'Ishaa', constant.ishaaMsg, 'PM');
+    console.log('====================================');
+    console.log({
+      fajer,
+      sunrise,
+      dhuhur,
+      asr,
+      maghreb,
+      Ishaa,
+    });
+    console.log('====================================');
     return {
       fajer,
       sunrise,
